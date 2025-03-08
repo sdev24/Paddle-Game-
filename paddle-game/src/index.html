@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paddle Game</title>
+    <style>
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+        }
+        #scoreBoard {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div>
+        <label for="speedSlider">Ball Speed:</label>
+        <input type="range" id="speedSlider" min="1" max="10" value="2">
+    </div>
+    <div>
+        <label for="sizeSlider">Ball Size:</label>
+        <input type="range" id="sizeSlider" min="5" max="20" value="10">
+    </div>
+    <div id="scoreBoard">
+        Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let ballRadius = 10;
+            let x = canvas.width / 2;
+            let y = canvas.height / 2;
+            let dx = 2;
+            let dy = 2;
+
+            const paddleHeight = 75;
+            const paddleWidth = 10;
+            let paddle1Y = (canvas.height - paddleHeight) / 2;
+            let paddle2Y = (canvas.height - paddleHeight) / 2;
+
+            const sliderSpeed = document.getElementById('speedSlider');
+            const sliderSize = document.getElementById('sizeSlider');
+
+            sliderSpeed.addEventListener('input', function() {
+                dx = parseFloat(this.value);
+                dy = parseFloat(this.value);
+            });
+
+            sliderSize.addEventListener('input', function() {
+                ballRadius = parseFloat(this.value);
+            });
+
+            document.addEventListener('keydown', keyDownHandler);
+            document.addEventListener('keyup', keyUpHandler);
+
+            let rightPressed = false;
+            let leftPressed = false;
+
+            function keyDownHandler(e) {
+                if (e.key === 'Down' || e.key === 'ArrowDown') {
+                    rightPressed = true;
+                } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+                    leftPressed = true;
+                }
+            }
+
+            function keyUpHandler(e) {
+                if (e.key === 'Down' || e.key === 'ArrowDown') {
+                    rightPressed = false;
+                } else if (e.key === 'Up' || e.key === 'ArrowUp') {
+                    leftPressed = false;
+                }
+            }
+
+            let player1Score = 0;
+            let player2Score = 0;
+            const winningScore = 20;
+
+            const player1ScoreDisplay = document.getElementById('player1Score');
+            const player2ScoreDisplay = document.getElementById('player2Score');
+
+            function updateScore() {
+                player1ScoreDisplay.textContent = player1Score;
+                player2ScoreDisplay.textContent = player2Score;
+            }
+
+            function checkGameOver() {
+                if (player1Score >= winningScore || player2Score >= winningScore) {
+                    alert(`Game Over! ${player1Score >= winningScore ? 'Player 1' : 'Player 2'} wins!`);
+                    document.location.reload();
+                }
+            }
+
+            function drawBall() {
+                console.log('Drawing ball at:', x, y);
+                ctx.beginPath();
+                ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+                ctx.fillStyle = '#0095DD';
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function drawPaddle(x, y) {
+                console.log('Drawing paddle at:', x, y);
+                ctx.beginPath();
+                ctx.rect(x, y, paddleWidth, paddleHeight);
+                ctx.fillStyle = '#0095DD';
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawBall();
+                drawPaddle(0, paddle1Y);
+                drawPaddle(canvas.width - paddleWidth, paddle2Y);
+
+                if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+                    dy = -dy;
+                }
+
+                if (x + dx > canvas.width - ballRadius) {
+                    if (y > paddle2Y && y < paddle2Y + paddleHeight) {
+                        dx = -dx;
+                    } else {
+                        player1Score++;
+                        updateScore();
+                        checkGameOver();
+                        x = canvas.width / 2;
+                        y = canvas.height / 2;
+                        dx = -dx;
+                    }
+                } else if (x + dx < ballRadius) {
+                    if (y > paddle1Y && y < paddle1Y + paddleHeight) {
+                        dx = -dx;
+                    } else {
+                        player2Score++;
+                        updateScore();
+                        checkGameOver();
+                        x = canvas.width / 2;
+                        y = canvas.height / 2;
+                        dx = -dx;
+                    }
+                }
+
+                if (rightPressed && paddle2Y < canvas.height - paddleHeight) {
+                    paddle2Y += 7;
+                } else if (leftPressed && paddle2Y > 0) {
+                    paddle2Y -= 7;
+                }
+
+                // CPU player logic for player 1
+                if (y > paddle1Y + paddleHeight / 2 && paddle1Y < canvas.height - paddleHeight) {
+                    paddle1Y += 4;
+                } else if (y < paddle1Y + paddleHeight / 2 && paddle1Y > 0) {
+                    paddle1Y -= 4;
+                }
+
+                x += dx;
+                y += dy;
+            }
+
+            setInterval(draw, 10);
+        });
+    </script>
+</body>
+</html>

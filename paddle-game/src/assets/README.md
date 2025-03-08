@@ -1,0 +1,1 @@
+# This file provides information about the assets used in the game, including any images or sounds that may be included in the future.

@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+canvas {
+    border: 2px solid #000;
+    background-color: #fff;
+}
+
+.paddle {
+    width: 10px;
+    height: 100px;
+    background-color: #007bff;
+    position: absolute;
+}
+
+.ball {
+    border-radius: 50%;
+    background-color: #ff0000;
+    position: absolute;
+}
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.slider {
+    width: 300px;
+    margin: 10px 0;
+}
