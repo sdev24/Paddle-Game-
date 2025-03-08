@@ -30,7 +30,11 @@
     <div id="scoreBoard">
         Player 1: <span id="player1Score">0</span> | Player 2: <span id="player2Score">0</span>
     </div>
-    <script>
+    <audio id="paddleSound" src="sounds/paddle.mp3"></audio>
+    <audio id="wallSound" src="sounds/wall.mp3"></audio>
+    <audio id="winSound" src="sounds/win.mp3"></audio>
+    <audio id="loseSound" src="sounds/lose.mp3"></audio>
+    <script></script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const canvas = document.getElementById('gameCanvas');
             const ctx = canvas.getContext('2d');
@@ -92,8 +96,23 @@
                 player2ScoreDisplay.textContent = player2Score;
             }
 
+            const paddleSound = document.getElementById('paddleSound');
+            const wallSound = document.getElementById('wallSound');
+            const winSound = document.getElementById('winSound');
+            const loseSound = document.getElementById('loseSound');
+
+            function playSound(sound) {
+                sound.currentTime = 0;
+                sound.play();
+            }
+
             function checkGameOver() {
                 if (player1Score >= winningScore || player2Score >= winningScore) {
+                    if (player1Score >= winningScore) {
+                        playSound(winSound);
+                    } else {
+                        playSound(loseSound);
+                    }
                     alert(`Game Over! ${player1Score >= winningScore ? 'Player 1' : 'Player 2'} wins!`);
                     document.location.reload();
                 }
@@ -125,11 +144,13 @@
 
                 if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
                     dy = -dy;
+                    playSound(wallSound);
                 }
 
                 if (x + dx > canvas.width - ballRadius) {
                     if (y > paddle2Y && y < paddle2Y + paddleHeight) {
                         dx = -dx;
+                        playSound(paddleSound);
                     } else {
                         player1Score++;
                         updateScore();
@@ -141,6 +162,7 @@
                 } else if (x + dx < ballRadius) {
                     if (y > paddle1Y && y < paddle1Y + paddleHeight) {
                         dx = -dx;
+                        playSound(paddleSound);
                     } else {
                         player2Score++;
                         updateScore();
